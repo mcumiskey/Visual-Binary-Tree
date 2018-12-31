@@ -1,23 +1,15 @@
 //binary search tree visualed using javascript 
 
-var canvasWidth = 800;
-var deltaX = 20;
-var deltaY = 20;
-var maxDepth = 8;
 
 function setup(){
-    
-    createCanvas(canvasWidth, 600);
+    createCanvas(600, 400);
     background(0);
     textAlign(CENTER);
     tree = new Tree();
     tree.addValue(5);
     tree.addValue(2);
-
     tree.addValue(0);
     tree.addValue(-10);
-        tree.addValue(-2);
-
     tree.addValue(-11);
     tree.addValue(-12);
     tree.addValue(2);
@@ -36,17 +28,6 @@ function Node(input) {
     this.data = input;
     this.left = null;
     this.right = null;
-    this.xpos = 0;
-    this.ypos = 0;
-}
-
-
-// Performs inorder traversal of a tree 
-Tree.prototype.inorder = function(node) { 
-    if(node !== null) { 
-        this.inorder(node.left); //go left
-        this.inorder(node.right); //go right
-    } 
 }
 
 function Tree(){
@@ -68,7 +49,8 @@ Tree.prototype.addValue = function(val) {
    var newNode = new Node(val); 
 
    if(this.root == null){					//if there is no root, create one
-      this.root = new Node(val, height / 2, width / 2, 0, 0);
+      this.root = new Node(val, height / 2, width / 2);
+      return;
    } else {									 //otherwise 
         this.insertNode(this.root, newNode); // find the correct position in the   
    }    								     // tree and add the node
@@ -82,22 +64,15 @@ Tree.prototype.insertNode = function(node, newNode) {
     if(newNode.data === node.data) { 
         return;
     }
-    console.log("insertNode node.data: " + node.data + " newNode.data: " + newNode.data);
-    newNode.ypos = node.ypos + 1
-    
     // if the data is less than the node 
     // data move left of the tree  
     if(newNode.data < node.data) { 
         // if left is null insert node here 
-        if (node.left === null) {
-            newNode.xpos = node.xpos - maxDepth + newNode.ypos;
-            console.log("NewLeft node.data: " + node.data, " node.xpos: " + node.xpos, " newNode.xpos: " + newNode.xpos);
+        if(node.left === null) {
             node.left = newNode; 
-            return;
         } else {
             // if left is not null recurr until  
             // null is found 
-            console.log("NewLeft cannot insert.  node.left: " + node.left);
             this.insertNode(node.left, newNode);
         }  
     }
@@ -106,16 +81,12 @@ Tree.prototype.insertNode = function(node, newNode) {
     // data move right of the tree  
     else { 
         // if right is null insert node here 
-        if(node.right === null) {
-            newNode.xpos = node.xpos + 5 - newNode.ypos;
-            console.log("NewRight node.data: " + node.data, " node.xpos: " + node.xpos, " newNode.xpos: " + newNode.xpos);
+        if(node.right === null) 
             node.right = newNode; 
-            return;
-        } else {
+        else
             // if right is not null recurr until  
             // null is found 
             this.insertNode(node.right,newNode); 
-        }
     } 
 }
 
@@ -145,6 +116,14 @@ Tree.prototype.search = function(node, data) {
     }
 } 
 
+// Performs inorder traversal of a tree 
+Tree.prototype.inorder = function(node) { 
+    if(node !== null) { 
+        this.inorder(node.left); //go left
+        console.log(node.data); //do thing
+        this.inorder(node.right); //go right
+    } 
+}
 
 function Renderer(size){
     this.size = size;    
@@ -176,26 +155,16 @@ Renderer.prototype.createLevels = function(treeheight){
 
 }
 
-Renderer.prototype.traverseByRoot = function(node){
+Renderer.prototype.traverseByRoot = function(node, x, y){
     if(node !== null){
-        x = (canvasWidth / 2) + (node.xpos * deltaX)
-        xRight = x + ((node.xpos - 1) * deltaX)
-        xLeft = x - ((node.xpos - 1) * deltaX)
-        
-        y = 20 + node.xpos * deltaY
-        yNew = 30 + y + deltaY
-    	console.log("traverseNode data: " + node.data +" xpos: " + node.xpos + " ypos: " + node.ypos);
-        
         fill(this.color);
     	ellipse(x, y, this.size);
         stroke(this.color);
-        line(x, y, xRight, yNew);
-        line(x, y, xLeft, yNew);
+        line(x, y, x + (x * .2), y + 40);
+        line(x, y, x - (x * .2), y + 40);
         fill(0);
         text(node.data, x, y+4);
-        this.traverseByRoot(node.left);
-        this.traverseByRoot(node.right);
-    } else {
-        console.log("I has a null node");
+        this.traverseByRoot(node.left, x - (x * .2), y + 50);
+        this.traverseByRoot(node.right, x + (x * .2), y + 50);
     }
 }
